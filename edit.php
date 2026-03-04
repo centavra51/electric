@@ -1,6 +1,8 @@
 <?php
 // Simple CMS for Article editing
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $password = "admin"; // Highly secret password :D
 $dir = "articles/";

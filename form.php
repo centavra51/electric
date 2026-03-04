@@ -39,19 +39,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $logEntry = "[" . date("Y-m-d H:i:s") . "]\n" . $message . "-----------------------\n";
     file_put_contents('leads.txt', $logEntry, FILE_APPEND);
 
-    // --- TELEGRAM NOTIFICATION (Optional Setup) ---
-    // define('TELEGRAM_BOT_TOKEN', 'YOUR_BOT_TOKEN');
-    // define('TELEGRAM_CHAT_ID', 'YOUR_CHAT_ID');
-    // 
-    // if (defined('TELEGRAM_BOT_TOKEN') && defined('TELEGRAM_CHAT_ID')) {
-    //     $url = "https://api.telegram.org/bot" . TELEGRAM_BOT_TOKEN . "/sendMessage?chat_id=" . TELEGRAM_CHAT_ID;
-    //     $url .= "&text=" . urlencode($message);
-    //     $ch = curl_init();
-    //     $optArray = array(CURLOPT_URL => $url, CURLOPT_RETURNTRANSFER => true);
-    //     curl_setopt_array($ch, $optArray);
-    //     $result = curl_exec($ch);
-    //     curl_close($ch);
-    // }
+    // --- TELEGRAM NOTIFICATION ---
+    // User needs to fill these constants or they can be passed as hidden fields (though not secure)
+    $botToken = ''; // e.g. '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11'
+    $chatId = ''; // e.g. '123456789'
+    
+    if (!empty($botToken) && !empty($chatId)) {
+        $url = "https://api.telegram.org/bot" . $botToken . "/sendMessage?chat_id=" . $chatId;
+        $url .= "&text=" . urlencode($message);
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
+        // If there's a photo, send it too
+        if($photoPath) {
+             $photoUrl = "https://api.telegram.org/bot" . $botToken . "/sendPhoto?chat_id=" . $chatId;
+             $cFile = new CURLFile(realpath($photoPath));
+             $post = ['photo'=> $cFile, 'caption' => "Фото к заявке от $name"];
+             
+             $chPhoto = curl_init();
+             curl_setopt($chPhoto, CURLOPT_URL, $photoUrl);
+             curl_setopt($chPhoto, CURLOPT_POST, 1);
+             curl_setopt($chPhoto, CURLOPT_POSTFIELDS, $post);
+             curl_setopt($chPhoto, CURLOPT_RETURNTRANSFER, true);
+             curl_exec($chPhoto);
+             curl_close($chPhoto);
+        }
+        
+        curl_exec($ch);
+        curl_close($ch);
+    }
 
     // --- EMAIL NOTIFICATION (Optional Setup) ---
     // $to = "your-email@example.com";
