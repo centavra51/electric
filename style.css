@@ -521,6 +521,16 @@ input:checked+.slider:before {
   margin-bottom: 20px;
 }
 
+.form-label {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--text-dark);
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
 .form-control {
   width: 100%;
   padding: 14px;
@@ -528,7 +538,14 @@ input:checked+.slider:before {
   border-radius: 8px;
   font-family: inherit;
   font-size: 1rem;
+  color: var(--text-dark);
+  background: rgba(255, 255, 255, 0.98);
   transition: 0.3s;
+}
+
+.form-control::placeholder {
+  color: #475569;
+  opacity: 1;
 }
 
 .form-control:focus {
